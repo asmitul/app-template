@@ -20,10 +20,10 @@ if LOGS_LOCATE == "LOCAL":
 if LOGS_LOCATE == "REMOTE":
     from pymongo import MongoClient
     client = MongoClient(f'mongodb://{os.getenv("MONGODB_USER")}:{os.getenv("MONGODB_PASSWORD")}@{os.getenv("MONGODB_HOST")}:{os.getenv("MONGODB_PORT")}/?authMechanism=DEFAULT')
-    db = client[os.getenv("APP_NAME")+os.getenv("MONGODB_LOGS_DATABASE_NAME")]
+    db_logs = client[os.getenv("APP_NAME")+os.getenv("MONGODB_LOGS_DATABASE_NAME")]
     from datetime import datetime
     current_date = datetime.now().strftime("%Y-%m-%d")
-    collection = db["log_"+current_date]
+    collection_logs = db_logs["log_"+current_date]
 
     logger = logging.getLogger(__name__)
     logger.setLevel(os.getenv("LOGGING_LEVEL"))
@@ -32,7 +32,7 @@ if LOGS_LOCATE == "REMOTE":
         def emit(self, record):
             from datetime import datetime
             record.created = datetime.now().isoformat()
-            collection.insert_one(record.__dict__)
+            collection_logs.insert_one(record.__dict__)
 
     logger.addHandler(MongoDBhandler())
 
